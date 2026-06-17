@@ -180,7 +180,11 @@ table.log td .cell:focus{outline:2px solid var(--orange-bright);outline-offset:-
   body.printing .print-target .no-print{display:none !important}
   [contenteditable][data-ph]:empty:before{content:'' !important}
   .record{break-inside:avoid}
+  body.printing .blank-record.print-target{display:block}
 }
+
+/* Hidden blank record, shown only when printed */
+.blank-record{display:none}
 </style>
 </head>
 <body>
@@ -351,6 +355,26 @@ table.log td .cell:focus{outline:2px solid var(--orange-bright);outline-offset:-
     </div>
 
     <button class="btn add no-print" data-action="add-session">+ Add another session record</button>
+
+    <div class="btnrow no-print" style="margin-top:14px">
+      <button class="btn ghost" data-action="print-blank">Print blank record sheet</button>
+    </div>
+
+    <!-- Hidden blank record, used only for printing a clean sheet to write on -->
+    <div class="record blank-record" id="blank-record">
+      <div class="rhead"><span class="rtitle">Mentoring session record</span><span class="rlogo" role="img" aria-label="Story"></span></div>
+      <div class="fgrid">
+        <div class="fld"><label>My name</label><input type="text"/></div>
+        <div class="fld"><label>Session number</label><input type="text"/></div>
+        <div class="fld"><label>Date</label><input type="text"/></div>
+      </div>
+      <div class="frow">
+        <div class="fld"><label>What I wanted to discuss (my agenda)</label><div class="entry"></div></div>
+        <div class="fld"><label>Key points and insights</label><div class="entry tall"></div></div>
+        <div class="fld"><label>Actions I agreed, and by when</label><div class="entry tall"></div></div>
+        <div class="fld"><label>My reflection afterwards</label><div class="entry"></div></div>
+      </div>
+    </div>
   </div>
   <div class="wm">STORY</div>
 </section>
@@ -411,6 +435,13 @@ table.log td .cell:focus{outline:2px solid var(--orange-bright);outline-offset:-
     window.print();
   }
 
+  function printBlank(){
+    document.querySelectorAll('.print-target').forEach(function(c){ c.classList.remove('print-target'); });
+    document.getElementById('blank-record').classList.add('print-target');
+    document.body.classList.add('printing');
+    window.print();
+  }
+
   window.addEventListener('afterprint', function(){
     document.body.classList.remove('printing');
     document.querySelectorAll('.print-target').forEach(function(c){ c.classList.remove('print-target'); });
@@ -438,6 +469,7 @@ table.log td .cell:focus{outline:2px solid var(--orange-bright);outline-offset:-
     var action = btn.getAttribute('data-action');
     if(action === 'add-session'){ addSession(); return; }
     if(action === 'add-row'){ addRow(); return; }
+    if(action === 'print-blank'){ printBlank(); return; }
     var card = btn.closest('.printable');
     if(!card) return;
     if(action === 'print'){ printCard(card); }
